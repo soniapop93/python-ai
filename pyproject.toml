@@ -1,0 +1,25 @@
+[project]
+name = "python-ai"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "soniapop93", email = "popsonia85@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "openai>=3.8.0",
+    "pydantic>=2.13.5",
+    "python-dotenv>=1.2.3",
+]
+
+[project.scripts]
+python-ai = "python_ai:main"
+
+[build-system]
+requires = ["uv_build>=0.12.9,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+]
