@@ -17,26 +17,28 @@ class UserValidator(BaseModel):
 
 received_user = { "name": "Vincentiu", "age": 25, "nationality": "Romanian", "address": {"city": "Brasso", "street": "Principala"} }
 
-print("===============Validations=============")
+if __name__ == "__main__":
 
-#  try-catch (except)
+    print("===============Validations=============")
 
-try:
-    validated_user = UserValidator.model_validate(received_user, strict=True)
-    print(validated_user.name)
-except ValidationError as e:
-    print(e)
-    print(e.errors())
-finally:
-    print("Done")
+    #  try-catch (except)
+
+    try:
+        validated_user = UserValidator.model_validate(received_user, strict=True)
+        print(validated_user.name)
+    except ValidationError as e:
+        print(e)
+        print(e.errors())
+    finally:
+        print("Done")
 
 
-varx = None
-print(varx)
+    varx = None
+    print(varx)
 
-def function2():
-    v = 10
-    v += 20
-    # return None  -> return-ul este implicit None
+    def function2():
+        v = 10
+        v += 20
+        # return None  -> return-ul este implicit None
 
-print(function2())
+    print(function2())

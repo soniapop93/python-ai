@@ -1,0 +1,9 @@
+{
+    "name": "Vincentiu",
+    "age": 25,
+    "nationality": "Romanian",
+    "address": {
+        "city": "Brasso",
+        "street": "Principala"
+    }
+}
