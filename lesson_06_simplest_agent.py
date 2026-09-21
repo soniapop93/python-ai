@@ -1,8 +1,31 @@
 import os
+import subprocess
+from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 
 
+def run_tests() -> str:
+    try:
+        result = subprocess.run(
+            ["uv", "run", "pytest"],
+            cwd=Path.cwd(),
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        return (result.stdout or "No output") + "" + (result.stderr or "")
+    except Exception as e:
+        print(e)
+
+def complete(client: OpenAI, messages: list[dict], tools: list[dict]):
+    response = client.chat.completions.create(
+        messages=messages,
+        model=os.getenv("OPEN_ROUTER_MODEL_NAME"),
+        tools=tools,
+        tool_choice="auto"
+    ).choices[0].message
+    return response
 
 
 def main():
@@ -18,29 +41,45 @@ def main():
         "role": "system",
         "content": "Use run_tests tool when asked to run any tests."
     })
-    messages.append({
-        "role": "user",
-        "content": input("you> ")
-    })
 
-    tools = [
-        {
-            "type": "function",
-            "function": {
-                "name": "run_tests",
-                "description": "Run uv run pytest"
+    while True:
+        inp = input("you> ")
+
+        if inp == "quit":
+            break
+        messages.append({
+            "role": "user",
+            "content": input("you> ")
+        })
+
+        tools = [
+            {
+                "type": "function",
+                "function": {
+                    "name": "run_tests",
+                    "description": "Run uv run pytest"
+                }
             }
-        }
-    ]
+        ]
 
-    response = client.chat.completions.create(
-        messages=messages,
-        model=os.getenv("OPEN_ROUTER_MODEL_NAME"),
-        tools=tools,
-        tool_choice="auto"
-    ).choices[0].message
+        response = complete(client, messages, tools)
 
-    print(response)
+        if response.tool_calls:
+            for tool_call in response.tool_calls:
+                output = run_tests()
+                messages.append(
+                    {
+                        "role": "system",
+                        "tool_call_id": tool_call.tool_call_id,
+                        "content": output
+                    }
+                )
+
+            response = complete(client, messages, tools)
+            print("agent> ", response)
+
+        print(f"Message count: {len(messages)}")
 
 if __name__ == "__main__":
     main()
+    print(run_tests())
